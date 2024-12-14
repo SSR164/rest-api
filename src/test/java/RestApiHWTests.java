@@ -7,13 +7,14 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 import static specs.UserSpecs.*;
 
-public class RestApiHWTests {
+public class RestApiHWTests extends TestBase {
     @Test
     void checkStatusCodeTest() {
         Response response = step("Make request", ()->
-        given(userRequestSpecific)
+        given(userRequestSpecification)
+                .queryParam("page","2")
                 .when()
-                .get("/api/users?page=2"));
+                .get("/users"));
         step("Check response", ()->{
             response.then()
                     .spec(userResponseSpecification200);
@@ -23,9 +24,9 @@ public class RestApiHWTests {
     @Test
     void checkSingleUserTest() {
         LombokModel response =step("Make request", ()->
-                given(userRequestSpecific)
+                given(userRequestSpecification)
                 .when()
-                    .get("/api/users/2")
+                    .get("/users/2")
                 .then()
                     .spec(userResponseSpecificationJson200)
                 .extract().as(LombokModel.class));
@@ -39,9 +40,9 @@ public class RestApiHWTests {
     @Test
     void checkSingleUserNotFoundTest() {
         LombokModel response = step("Make request", ()->
-                given(userRequestSpecific)
+                given(userRequestSpecification)
                 .when()
-                    .get("/api/users/23")
+                    .get("/users/23")
                 .then()
                     .spec(userResponseSpecification404)
                 .extract().as(LombokModel.class));
@@ -58,10 +59,10 @@ public class RestApiHWTests {
         authData.setName("morpheus");
 
         LombokModel response = step("Make request", ()->
-                given(userRequestSpecificMax)
+                given(userRequestSpecification)
                     .body(authData)
                 .when()
-                    .post("/api/users")
+                    .post("/users")
                 .then()
                     .spec(userResponseSpecification201)
                 .extract().as(LombokModel.class));
@@ -78,10 +79,10 @@ public class RestApiHWTests {
         authData.setJob("zion resident");
         authData.setName("morpheus");
         LombokModel response = step("Make request", ()->
-                given(userRequestSpecificMax)
+                given(userRequestSpecification)
                     .body(authData)
                 .when()
-                    .put("/api/users/2")
+                    .put("/users/2")
                 .then()
                     .spec(userResponseSpecification200)
                 .extract().as(LombokModel.class));
